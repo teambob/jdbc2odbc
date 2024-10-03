@@ -1,7 +1,6 @@
-package io.github;
+package io.github.jdbc2odbc;
 
 
-import java.nio.ByteBuffer;
 import java.sql.Connection;
 import java.sql.DriverPropertyInfo;
 import java.sql.SQLException;
@@ -17,6 +16,8 @@ public class Driver implements java.sql.Driver {
     Long envHandle = null;
     public Driver(){
         PointerBuffer outHandle = PointerBuffer.allocateDirect(8);
+
+        //TODO: close driver handle
         SQLAllocHandle(
                 SQL_HANDLE_ENV, SQL_NULL_HANDLE, outHandle);
         envHandle = outHandle.get();
@@ -27,7 +28,7 @@ public class Driver implements java.sql.Driver {
     @Override
     public Connection connect(String s, Properties properties) throws SQLException {
 
-        return new io.github.Connection(envHandle, s, properties);
+        return new io.github.jdbc2odbc.Connection(envHandle, s, properties);
     }
 
     @Override
@@ -40,6 +41,7 @@ public class Driver implements java.sql.Driver {
         return new DriverPropertyInfo[0];
     }
 
+    // Version 0.1 - alpha
     @Override
     public int getMajorVersion() {
         return 0;
@@ -47,7 +49,7 @@ public class Driver implements java.sql.Driver {
 
     @Override
     public int getMinorVersion() {
-        return 0;
+        return 1;
     }
 
     @Override

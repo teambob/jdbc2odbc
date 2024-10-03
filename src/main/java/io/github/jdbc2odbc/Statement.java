@@ -1,11 +1,10 @@
-package io.github;
+package io.github.jdbc2odbc;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.PointerBuffer;
-import org.lwjgl.system.Pointer;
 
-import java.nio.LongBuffer;
-import java.nio.ShortBuffer;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -27,7 +26,7 @@ public class Statement implements java.sql.Statement{
         SQLExecDirect(statementHandle, s);
         PointerBuffer rowCountOut = PointerBuffer.allocateDirect(8);
         SQLRowCount(statementHandle, rowCountOut);
-        return new io.github.ResultSet(statementHandle);
+        return new io.github.jdbc2odbc.ResultSet(statementHandle);
     }
 
     @Override
@@ -37,7 +36,7 @@ public class Statement implements java.sql.Statement{
 
     @Override
     public void close() throws SQLException {
-
+        SQLFreeHandle(SQL_HANDLE_STMT, statementHandle);
     }
 
     @Override
@@ -67,12 +66,15 @@ public class Statement implements java.sql.Statement{
 
     @Override
     public int getQueryTimeout() throws SQLException {
-        return 0;
+        ByteBuffer valueOut = BufferUtils.createByteBuffer(8);
+        IntBuffer strlenOut = BufferUtils.createIntBuffer(8);
+        SQLGetStmtAttr(statementHandle, SQL_ATTR_QUERY_TIMEOUT, valueOut, strlenOut);
+        return valueOut.getInt();
     }
 
     @Override
     public void setQueryTimeout(int i) throws SQLException {
-
+        nSQLSetStmtAttr(statementHandle, SQL_ATTR_QUERY_TIMEOUT, i, SQL_IS_INTEGER);
     }
 
     @Override

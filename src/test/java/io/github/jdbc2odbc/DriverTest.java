@@ -1,4 +1,4 @@
-package io.github;
+package io.github.jdbc2odbc;
 
 import java.sql.Connection;
 import java.sql.ResultSet;

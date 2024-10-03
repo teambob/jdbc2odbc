@@ -1,4 +1,4 @@
-package io.github;
+package io.github.jdbc2odbc;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.PointerBuffer;
 
@@ -36,7 +36,8 @@ public class ResultSet implements java.sql.ResultSet{
             ShortBuffer outStringLength = BufferUtils.createShortBuffer(4);
             PointerBuffer outNumericAttributePtr = BufferUtils.createPointerBuffer(8);
             SQLColAttribute(statementHandle, index, SQL_DESC_NAME, outColumnName, outStringLength, outNumericAttributePtr);
-            String columnName = StandardCharsets.UTF_8.decode(outColumnName).toString();
+            outColumnName.limit(outStringLength.get());
+            String columnName = StandardCharsets.UTF_16LE.decode(outColumnName).toString();
             columnNames.add(columnName);
 
             System.out.println("Column name: "+columnName);
@@ -52,7 +53,6 @@ public class ResultSet implements java.sql.ResultSet{
 
     @Override
     public void close() throws SQLException {
-
     }
 
     @Override
@@ -66,8 +66,9 @@ public class ResultSet implements java.sql.ResultSet{
         ByteBuffer outString = BufferUtils.createByteBuffer(1024); // TODO: make dynamic
         PointerBuffer outStrlen = BufferUtils.createPointerBuffer(8);
 
-        SQLGetData(statementHandle, (short)i, SQL_C_CHAR, outString, outStrlen);
-        return StandardCharsets.UTF_8.decode(outString).toString();
+        SQLGetData(statementHandle, (short)i, SQL_C_WCHAR, outString, outStrlen);
+        outString.limit((int) outStrlen.get());
+        return StandardCharsets.UTF_16LE.decode(outString).toString();
     }
 
     @Override

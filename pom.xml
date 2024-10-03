@@ -111,6 +111,12 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>3.0.0</version>
+                    <configuration>
+                        <forkCount>1</forkCount>
+                        <!-- argLine is not working -->
+                        <argLine>-Djava.library.path=/usr/local/lib/</argLine>
+                    </configuration>
+
                 </plugin>
             </plugins>
         </pluginManagement>
