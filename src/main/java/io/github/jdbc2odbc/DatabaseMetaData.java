@@ -1,13 +1,22 @@
 package io.github.jdbc2odbc;
 
+import org.lwjgl.*;
+import org.lwjgl.system.MemoryUtil;
+
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.sql.*;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.RowIdLifetime;
-import java.sql.SQLException;
+
+import static org.lwjgl.odbc.SQL.*;
 
 public class DatabaseMetaData implements java.sql.DatabaseMetaData {
+    Connection connection = null;
     Long connHandle = null;
-    public DatabaseMetaData(long connHandle) {
+
+    public DatabaseMetaData(Connection connection, long connHandle) {
+        this.connection = connection;
         this.connHandle = connHandle;
     }
 
@@ -68,7 +77,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
 
     @Override
     public String getDriverName() throws SQLException {
-        return "";
+        return "jdbc2odbc.github.io";
     }
 
     @Override
@@ -602,8 +611,19 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
     }
 
     @Override
-    public ResultSet getProcedures(String s, String s1, String s2) throws SQLException {
-        return null;
+    public ResultSet getProcedures(String catalog, String schemaPattern, String procedureNamePattern) throws SQLException {
+        PointerBuffer outHandle = PointerBuffer.allocateDirect(8);
+        SQLAllocHandle(
+                SQL_HANDLE_STMT, connHandle, outHandle);
+
+        long statementHandle = outHandle.get();
+        SQLProcedures(
+                statementHandle,
+                StandardCharsets.UTF_16LE.encode(catalog),
+                StandardCharsets.UTF_16LE.encode(schemaPattern),
+                StandardCharsets.UTF_16LE.encode(procedureNamePattern)
+        );
+        return new io.github.jdbc2odbc.ResultSet(statementHandle);
     }
 
     @Override
@@ -613,17 +633,41 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
 
     @Override
     public ResultSet getTables(String s, String s1, String s2, String[] strings) throws SQLException {
-        return null;
+        PointerBuffer outHandle = PointerBuffer.allocateDirect(8);
+        SQLAllocHandle(
+                SQL_HANDLE_STMT, connHandle, outHandle);
+        long statementHandle = outHandle.get();
+        ByteBuffer BB_EMPTY = StandardCharsets.UTF_16LE.encode("");
+
+        SQLTables(statementHandle, BB_EMPTY, StandardCharsets.UTF_16LE.encode(SQL_ALL_SCHEMAS), BB_EMPTY,  BB_EMPTY);
+
+        return new io.github.jdbc2odbc.ResultSet(statementHandle);
     }
 
     @Override
     public ResultSet getSchemas() throws SQLException {
-        return null;
+        PointerBuffer outHandle = PointerBuffer.allocateDirect(8);
+        SQLAllocHandle(
+                SQL_HANDLE_STMT, connHandle, outHandle);
+        long statementHandle = outHandle.get();
+        ByteBuffer BB_EMPTY = StandardCharsets.UTF_16LE.encode("");
+
+        SQLTables(statementHandle, BB_EMPTY, StandardCharsets.UTF_16LE.encode(SQL_ALL_SCHEMAS), BB_EMPTY,  BB_EMPTY);
+
+        return new io.github.jdbc2odbc.ResultSet(statementHandle);
     }
 
     @Override
     public ResultSet getCatalogs() throws SQLException {
-        return null;
+        PointerBuffer outHandle = PointerBuffer.allocateDirect(8);
+        SQLAllocHandle(
+                SQL_HANDLE_STMT, connHandle, outHandle);
+        long statementHandle = outHandle.get();
+        ByteBuffer BB_EMPTY = StandardCharsets.UTF_16LE.encode("");
+
+        SQLTables(statementHandle, StandardCharsets.UTF_16LE.encode(SQL_ALL_CATALOGS), BB_EMPTY, BB_EMPTY,  BB_EMPTY);
+
+        return new io.github.jdbc2odbc.ResultSet(statementHandle);
     }
 
     @Override
@@ -753,7 +797,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
 
     @Override
     public Connection getConnection() throws SQLException {
-        return null;
+        return connection;
     }
 
     @Override
@@ -862,8 +906,8 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
     }
 
     @Override
-    public ResultSet getFunctions(String s, String s1, String s2) throws SQLException {
-        return null;
+    public ResultSet getFunctions(String catalog, String schemaPattern, String functionNamePattern) throws SQLException {
+        throw new SQLFeatureNotSupportedException("getFunctions() not implemented");
     }
 
     @Override

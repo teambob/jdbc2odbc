@@ -4,6 +4,7 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.system.MemoryUtil;
 
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.charset.StandardCharsets;
@@ -16,6 +17,7 @@ import static org.lwjgl.odbc.SQL.*;
 
 public class Connection implements java.sql.Connection {
     Long connHandle = null;
+    Properties properties = new Properties();
     public Connection(long envHandle, String s, Properties properties) {
         PointerBuffer outHandle = BufferUtils.createPointerBuffer(8);
         SQLAllocHandle(SQL_HANDLE_DBC, envHandle, outHandle);
@@ -32,14 +34,12 @@ public class Connection implements java.sql.Connection {
 
     @Override
     public PreparedStatement prepareStatement(String s) throws SQLException {
-        // TODO: implement or throw exception
-        return null;
+        throw new SQLFeatureNotSupportedException("prepareStatement() not supported");
     }
 
     @Override
     public CallableStatement prepareCall(String s) throws SQLException {
-        // TODO: implement or throw exception
-        return null;
+        throw new SQLFeatureNotSupportedException("prepareCall() not supported");
     }
 
     @Override
@@ -88,7 +88,7 @@ public class Connection implements java.sql.Connection {
 
     @Override
     public DatabaseMetaData getMetaData() throws SQLException {
-        return new DatabaseMetaData(connHandle);
+        return new DatabaseMetaData(this, connHandle);
     }
 
     @Override
@@ -116,14 +116,17 @@ public class Connection implements java.sql.Connection {
 
     @Override
     public void setTransactionIsolation(int i) throws SQLException {
-        // TODO: implement or throw exception
-        //SQLSetConnectAttr(connHandle, SQL_ATTR_TXN_ISOLATION, )
+        ByteBuffer valuePtr = BufferUtils.createByteBuffer(8);
+        valuePtr.putInt(i);
+        SQLSetConnectAttr(connHandle, SQL_ATTR_TXN_ISOLATION, valuePtr);
     }
 
     @Override
     public int getTransactionIsolation() throws SQLException {
-        // TODO: implement or throw exception
-        return 0;
+        ByteBuffer valuePtr = BufferUtils.createByteBuffer(8);
+        IntBuffer strlenOut = BufferUtils.createIntBuffer(8);
+        SQLGetConnectAttr(connHandle, SQL_ATTR_TXN_ISOLATION, valuePtr, strlenOut);
+        return valuePtr.getInt();
     }
 
     @Override
@@ -140,43 +143,37 @@ public class Connection implements java.sql.Connection {
 
     @Override
     public Statement createStatement(int i, int i1) throws SQLException {
-        // TODO: implement or throw exception
-        return null;
+        throw new SQLFeatureNotSupportedException("createStatement() not supported");
     }
 
     @Override
     public PreparedStatement prepareStatement(String s, int i, int i1) throws SQLException {
-        // TODO: implement or throw exception
-        return null;
+        throw new SQLFeatureNotSupportedException("prepareStatement() not supported");
     }
 
     @Override
     public CallableStatement prepareCall(String s, int i, int i1) throws SQLException {
-        // TODO: implement or throw exception
-        return null;
+        throw new SQLFeatureNotSupportedException("prepareCall() not supported");
     }
 
     @Override
     public Map<String, Class<?>> getTypeMap() throws SQLException {
-        // TODO: implement or throw exception
-        return Map.of();
+        throw new SQLFeatureNotSupportedException("getTypeMap() not supported");
     }
 
     @Override
     public void setTypeMap(Map<String, Class<?>> map) throws SQLException {
-        // TODO: implement or throw exception
-
+        throw new SQLFeatureNotSupportedException("setTypeMap() not supported");
     }
 
     @Override
     public void setHoldability(int i) throws SQLException {
-        // TODO: implement or throw exception
+        throw new SQLFeatureNotSupportedException("setHoldability() not supported");
     }
 
     @Override
     public int getHoldability() throws SQLException {
-        // TODO: implement or throw exception
-        return 0;
+        throw new SQLFeatureNotSupportedException("getHoldability() not supported");
     }
 
     @Override
@@ -201,62 +198,52 @@ public class Connection implements java.sql.Connection {
 
     @Override
     public Statement createStatement(int i, int i1, int i2) throws SQLException {
-        // TODO: implement or throw exception
-        return null;
+        throw new SQLFeatureNotSupportedException("createStatement() not implemented");
     }
 
     @Override
     public PreparedStatement prepareStatement(String s, int i, int i1, int i2) throws SQLException {
-        // TODO: implement or throw exception
-        return null;
+        throw new SQLFeatureNotSupportedException("prepareStatement() not implemented");
     }
 
     @Override
     public CallableStatement prepareCall(String s, int i, int i1, int i2) throws SQLException {
-        // TODO: implement or throw exception
-        return null;
+        throw new SQLFeatureNotSupportedException("prepareCall() not implemented");
     }
 
     @Override
     public PreparedStatement prepareStatement(String s, int i) throws SQLException {
-        // TODO: implement or throw exception
-        return null;
+        throw new SQLFeatureNotSupportedException("prepareStatement() not implemented");
     }
 
     @Override
     public PreparedStatement prepareStatement(String s, int[] ints) throws SQLException {
-        // TODO: implement or throw exception
-        return null;
+        throw new SQLFeatureNotSupportedException("prepareStatement() not implemented");
     }
 
     @Override
     public PreparedStatement prepareStatement(String s, String[] strings) throws SQLException {
-        // TODO: implement or throw exception
-        return null;
+        throw new SQLFeatureNotSupportedException("prepareStatement() not implemented");
     }
 
     @Override
     public Clob createClob() throws SQLException {
-        // TODO: implement or throw exception
-        return null;
+        throw new SQLFeatureNotSupportedException("createClob() not supported");
     }
 
     @Override
     public Blob createBlob() throws SQLException {
-        // TODO: implement or throw exception
-        return null;
+        throw new SQLFeatureNotSupportedException("createBlob() not supported");
     }
 
     @Override
     public NClob createNClob() throws SQLException {
-        // TODO: implement or throw exception
-        return null;
+        throw new SQLFeatureNotSupportedException("createNClob() not supported");
     }
 
     @Override
     public SQLXML createSQLXML() throws SQLException {
-        // TODO: implement or throw exception
-        return null;
+        throw new SQLFeatureNotSupportedException("createSQLXML() not supported");
     }
 
     @Override
@@ -267,47 +254,42 @@ public class Connection implements java.sql.Connection {
 
     @Override
     public void setClientInfo(String s, String s1) throws SQLClientInfoException {
-        // TODO: implement or throw exception
+        this.properties.setProperty(s, s1);
     }
 
     @Override
     public void setClientInfo(Properties properties) throws SQLClientInfoException {
-        // TODO: implement or throw exception
+        this.properties = properties;
     }
 
     @Override
     public String getClientInfo(String s) throws SQLException {
-        // TODO: implement or throw exception
-        return "";
+        return (String)properties.get(s);
     }
 
     @Override
     public Properties getClientInfo() throws SQLException {
-        // TODO: implement or throw exception
-        return null;
+        return properties;
     }
 
     @Override
     public Array createArrayOf(String s, Object[] objects) throws SQLException {
-        // TODO: implement or throw exception
-        return null;
+        throw new SQLFeatureNotSupportedException("createArrayOf() not supported");
     }
 
     @Override
     public Struct createStruct(String s, Object[] objects) throws SQLException {
-        // TODO: implement or throw exception
-        return null;
+        throw new SQLFeatureNotSupportedException("createStruct() not supported");
     }
 
     @Override
     public void setSchema(String s) throws SQLException {
-        // TODO: implement or throw exception
+        throw new SQLFeatureNotSupportedException("setSchema() not supported");
     }
 
     @Override
     public String getSchema() throws SQLException {
-        // TODO: implement or throw exception
-        return "";
+        throw new SQLFeatureNotSupportedException("getSchema() not supported");
     }
 
     @Override
@@ -317,24 +299,26 @@ public class Connection implements java.sql.Connection {
 
     @Override
     public void setNetworkTimeout(Executor executor, int i) throws SQLException {
-        // TODO: implement or throw exception
+        ByteBuffer valuePtr = BufferUtils.createByteBuffer(8);
+        valuePtr.putInt(i);
+        SQLSetConnectAttr(connHandle, SQL_ATTR_CONNECTION_TIMEOUT, valuePtr);
     }
 
     @Override
     public int getNetworkTimeout() throws SQLException {
-        // TODO: implement or throw exception
-        return 0;
+        ByteBuffer valuePtr = BufferUtils.createByteBuffer(8);
+        IntBuffer strlenOut = BufferUtils.createIntBuffer(8);
+        SQLGetConnectAttr(connHandle, SQL_ATTR_CONNECTION_TIMEOUT, valuePtr, strlenOut);
+        return valuePtr.getInt();
     }
 
     @Override
     public <T> T unwrap(Class<T> aClass) throws SQLException {
-        // TODO: implement or throw exception
-        return null;
+        throw new SQLFeatureNotSupportedException("unwrap() not supported");
     }
 
     @Override
     public boolean isWrapperFor(Class<?> aClass) throws SQLException {
-        // TODO: implement or throw exception
-        return false;
+        throw new SQLFeatureNotSupportedException("isWrapperFor() not supported");
     }
 }

@@ -5,10 +5,9 @@ import org.lwjgl.PointerBuffer;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.sql.*;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.SQLWarning;
 
 import static org.lwjgl.odbc.SQL.*;
 
@@ -104,7 +103,7 @@ public class Statement implements java.sql.Statement{
 
     @Override
     public ResultSet getResultSet() throws SQLException {
-        return null;
+        return new io.github.jdbc2odbc.ResultSet(statementHandle);
     }
 
     @Override
@@ -119,12 +118,12 @@ public class Statement implements java.sql.Statement{
 
     @Override
     public void setFetchDirection(int i) throws SQLException {
-
+        throw new SQLFeatureNotSupportedException("setFetchDirection() not supported");
     }
 
     @Override
     public int getFetchDirection() throws SQLException {
-        return 0;
+        throw new SQLFeatureNotSupportedException("getFetchDirection() not supported");
     }
 
     @Override
