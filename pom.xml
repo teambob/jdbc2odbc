@@ -105,7 +105,6 @@
         </dependencies>
     <!--</dependencyManagement>-->
     <build>
-        <pluginManagement>
             <plugins>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -113,12 +112,22 @@
                     <version>3.0.0</version>
                     <configuration>
                         <forkCount>1</forkCount>
-                        <!-- argLine is not working -->
-                        <argLine>-Djava.library.path=/usr/local/lib/</argLine>
                     </configuration>
 
                 </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-shade-plugin</artifactId>
+                    <version>3.6.0</version>
+                    <executions>
+                        <execution>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>shade</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
             </plugins>
-        </pluginManagement>
     </build>
 </project>

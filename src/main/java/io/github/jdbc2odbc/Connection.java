@@ -9,6 +9,7 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
+import java.sql.ResultSet;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
@@ -18,13 +19,22 @@ import static org.lwjgl.odbc.SQL.*;
 public class Connection implements java.sql.Connection {
     Long connHandle = null;
     Properties properties = new Properties();
-    public Connection(long envHandle, String s, Properties properties) {
+
+    public Connection(long envHandle, String s, Properties properties) throws SQLException {
         PointerBuffer outHandle = BufferUtils.createPointerBuffer(8);
-        SQLAllocHandle(SQL_HANDLE_DBC, envHandle, outHandle);
+        short ret = SQLAllocHandle(SQL_HANDLE_DBC, envHandle, outHandle);
+
+        if (ret != SQL_SUCCESS) {
+            throw new SQLException("SQLAllocHandle(SQL_HANDLE_DBC,...) failed");
+        }
 
         connHandle = outHandle.get();
 
-        SQLConnect(connHandle, s, "", "");
+        ret = SQLConnect(connHandle, "abc", "", "");
+        if (ret != SQL_SUCCESS) {
+            throw new SQLException("SQLConnect() failed");
+        }
+
     }
 
     @Override
@@ -142,8 +152,15 @@ public class Connection implements java.sql.Connection {
     }
 
     @Override
-    public Statement createStatement(int i, int i1) throws SQLException {
-        throw new SQLFeatureNotSupportedException("createStatement() not supported");
+    public Statement createStatement(int resultSetType, int resultSetConcurrency) throws SQLException {
+        if (resultSetType != ResultSet.TYPE_FORWARD_ONLY){
+            throw new SQLFeatureNotSupportedException("Only ResultSet.TYPE_FORWARD_ONLY is supported");
+        }
+        if (resultSetConcurrency != ResultSet.CONCUR_READ_ONLY){
+            throw new SQLFeatureNotSupportedException("Only ResultSet.CONCUR_READ_ONLY is supported");
+        }
+
+        return createStatement();
     }
 
     @Override
@@ -197,7 +214,7 @@ public class Connection implements java.sql.Connection {
     }
 
     @Override
-    public Statement createStatement(int i, int i1, int i2) throws SQLException {
+    public Statement createStatement(int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
         throw new SQLFeatureNotSupportedException("createStatement() not implemented");
     }
 

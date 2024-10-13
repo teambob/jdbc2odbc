@@ -8,21 +8,30 @@ import java.sql.SQLFeatureNotSupportedException;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import static org.lwjgl.odbc.SQL.*;
+import org.lwjgl.odbc.SQL;
 import org.lwjgl.*;
-
+import static org.lwjgl.system.Configuration.*;
 
 public class Driver implements java.sql.Driver {
     Long envHandle = null;
-    public Driver(){
+    public Driver() throws SQLException {
+        ODBC_LIBRARY_NAME.set("libodbc.so.2");
         PointerBuffer outHandle = PointerBuffer.allocateDirect(8);
 
         //TODO: close driver handle
-        SQLAllocHandle(
-                SQL_HANDLE_ENV, SQL_NULL_HANDLE, outHandle);
+        short ret = SQL.SQLAllocHandle(
+                SQL.SQL_HANDLE_ENV, SQL.SQL_NULL_HANDLE, outHandle);
+
+        if (ret != SQL.SQL_SUCCESS) {
+            throw new SQLException("SQLAllocHandle(SQL_HANDLE_ENV,...) failed");
+        }
         envHandle = outHandle.get();
 
-        nSQLSetEnvAttr(envHandle, SQL_ATTR_ODBC_VERSION, SQL_OV_ODBC3, 0);
+        ret = SQL.nSQLSetEnvAttr(envHandle, SQL.SQL_ATTR_ODBC_VERSION, SQL.SQL_OV_ODBC3, 0);
+        if (ret != SQL.SQL_SUCCESS) {
+            throw new SQLException("SQLSetEnvAttr() failed");
+        }
+
 
     }
     @Override

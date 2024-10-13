@@ -97,7 +97,6 @@ public class ResultSetMetaData implements java.sql.ResultSetMetaData {
         SQLColAttribute(statementHandle, (short)i, SQL_DESC_PRECISION, outValue, outStringLength, outNumericAttributePtr);
 
         return outValue.getInt();
-
     }
 
     @Override
@@ -108,7 +107,6 @@ public class ResultSetMetaData implements java.sql.ResultSetMetaData {
         SQLColAttribute(statementHandle, (short)i, SQL_DESC_SCALE, outValue, outStringLength, outNumericAttributePtr);
 
         return outValue.getInt();
-
     }
 
     @Override
@@ -137,9 +135,11 @@ public class ResultSetMetaData implements java.sql.ResultSetMetaData {
         ShortBuffer outStringLength = BufferUtils.createShortBuffer(16);
         PointerBuffer outNumericAttributePtr = BufferUtils.createPointerBuffer(16);
         SQLColAttribute(statementHandle, (short)i, SQL_DESC_TYPE, outValue, outStringLength, outNumericAttributePtr);
+        int type = (int)outNumericAttributePtr.get();
+        System.out.print("column type: ");
+        System.out.println(type);
 
-        return outValue.getInt();
-
+        return type;
     }
 
     @Override
@@ -149,7 +149,10 @@ public class ResultSetMetaData implements java.sql.ResultSetMetaData {
         PointerBuffer outNumericAttributePtr = BufferUtils.createPointerBuffer(16);
         SQLColAttribute(statementHandle, (short)i, SQL_DESC_TYPE_NAME, outColumnName, outStringLength, outNumericAttributePtr);
         outColumnName.limit(outStringLength.get());
-        return StandardCharsets.UTF_16LE.decode(outColumnName).toString();
+        String type = StandardCharsets.UTF_16LE.decode(outColumnName).toString();
+        System.out.print("column type: ");
+        System.out.println(type);
+        return type;
     }
 
     @Override

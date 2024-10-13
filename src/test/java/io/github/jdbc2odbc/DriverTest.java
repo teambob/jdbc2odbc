@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class DriverTest {
 
     @org.junit.jupiter.api.Test
-    void testtheclass() {
+    void testtheclass() throws SQLException {
         Driver driver = new Driver();
         assertTrue(driver instanceof Driver);
     }
@@ -33,6 +33,7 @@ class DriverTest {
         assertTrue(results != null);
         System.out.println(results.getString(1));
         System.out.println(results.getString(2));
+        System.out.println(results.getMetaData().getColumnCount());
 
 
     }

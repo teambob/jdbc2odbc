@@ -42,13 +42,14 @@ public class ResultSet implements java.sql.ResultSet{
 
             System.out.println("Column name: "+columnName);
         }
-        next();
+        //next();
     }
 
     @Override
     public boolean next() throws SQLException {
-        SQLFetch(statementHandle);
-        return false;
+        System.out.println("next()");
+        short result = SQLFetch(statementHandle);
+        return result == SQL_SUCCESS;
     }
 
     @Override
@@ -62,6 +63,7 @@ public class ResultSet implements java.sql.ResultSet{
 
     @Override
     public String getString(int i) throws SQLException {
+        System.out.println("getString() called");
         // TODO: check index
         ByteBuffer outString = BufferUtils.createByteBuffer(1024); // TODO: make dynamic
         PointerBuffer outStrlen = BufferUtils.createPointerBuffer(8);
@@ -243,7 +245,7 @@ public class ResultSet implements java.sql.ResultSet{
 
     @Override
     public ResultSetMetaData getMetaData() throws SQLException {
-        return null;
+        return new ResultSetMetaData(statementHandle, columnNames);
     }
 
     @Override

@@ -5,6 +5,7 @@ import org.lwjgl.PointerBuffer;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.nio.ShortBuffer;
 import java.sql.*;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -14,18 +15,20 @@ import static org.lwjgl.odbc.SQL.*;
 
 public class Statement implements java.sql.Statement{
     Long statementHandle = null;
-    public Statement(Long connHandle){
+    public Statement(Long connHandle) throws SQLException{
         PointerBuffer outHandle = PointerBuffer.allocateDirect(8);
-        SQLAllocHandle(
+        short ret = SQLAllocHandle(
                 SQL_HANDLE_STMT, connHandle, outHandle);
+
+        if (ret != SQL_SUCCESS){
+            throw new SQLException("SQLAllocHande(SQL_HANDLE_STMT,...) failed");
+        }
         statementHandle = outHandle.get();
     }
     @Override
     public ResultSet executeQuery(String s) throws SQLException {
-        SQLExecDirect(statementHandle, s);
-        PointerBuffer rowCountOut = PointerBuffer.allocateDirect(8);
-        SQLRowCount(statementHandle, rowCountOut);
-        return new io.github.jdbc2odbc.ResultSet(statementHandle);
+        execute(s);
+        return getResultSet();
     }
 
     @Override
@@ -35,7 +38,7 @@ public class Statement implements java.sql.Statement{
 
     @Override
     public void close() throws SQLException {
-        SQLFreeHandle(SQL_HANDLE_STMT, statementHandle);
+        //SQLFreeStmt(statementHandle, SQL_CLOSE);
     }
 
     @Override
@@ -98,7 +101,8 @@ public class Statement implements java.sql.Statement{
 
     @Override
     public boolean execute(String s) throws SQLException {
-        return false;
+        short result = SQLExecDirect(statementHandle, s);
+        return result==SQL_SUCCESS;
     }
 
     @Override
@@ -108,7 +112,18 @@ public class Statement implements java.sql.Statement{
 
     @Override
     public int getUpdateCount() throws SQLException {
-        return 0;
+        ShortBuffer columnCountOut = BufferUtils.createShortBuffer(8);
+        SQLNumResultCols(statementHandle, columnCountOut);
+
+        if (columnCountOut.get()>0){
+            return -1;
+        }
+        else {
+            PointerBuffer rowCountOut = PointerBuffer.allocateDirect(8);
+            SQLRowCount(statementHandle, rowCountOut);
+
+            return (int) rowCountOut.get();
+        }
     }
 
     @Override
