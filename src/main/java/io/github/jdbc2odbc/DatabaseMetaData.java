@@ -14,10 +14,15 @@ import static org.lwjgl.odbc.SQL.*;
 public class DatabaseMetaData implements java.sql.DatabaseMetaData {
     Connection connection = null;
     Long connHandle = null;
+    ByteBuffer BB_ALL = BufferUtils.createByteBuffer(8);
+
 
     public DatabaseMetaData(Connection connection, long connHandle) {
         this.connection = connection;
         this.connHandle = connHandle;
+        BB_ALL.put(StandardCharsets.UTF_16LE.encode("%"));
+        BB_ALL.limit(1);
+
     }
 
     @Override
@@ -632,52 +637,68 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
     }
 
     @Override
-    public ResultSet getTables(String s, String s1, String s2, String[] strings) throws SQLException {
-        PointerBuffer outHandle = PointerBuffer.allocateDirect(8);
-        SQLAllocHandle(
-                SQL_HANDLE_STMT, connHandle, outHandle);
+    public ResultSet getTables(String catalog, String schemaPattern, String tableNamePattern, String[] types) throws SQLException {
+        PointerBuffer outHandle = BufferUtils.createPointerBuffer(8);
+        if (SQLAllocHandle(
+                SQL_HANDLE_STMT, connHandle, outHandle) != SQL_SUCCESS) {
+            throw new SQLException("getTables() failed");
+        }
         long statementHandle = outHandle.get();
-        ByteBuffer BB_EMPTY = StandardCharsets.UTF_16LE.encode("");
 
-        SQLTables(statementHandle, BB_EMPTY, StandardCharsets.UTF_16LE.encode(SQL_ALL_SCHEMAS), BB_EMPTY,  BB_EMPTY);
+        String tableName = new String();
+        if (tableNamePattern != null){
+            tableName = tableNamePattern;
+        } else {
+            tableName = SQL_ALL_TABLE_TYPES;
+        }
+
+        if (SQLTables(statementHandle, StringToUTF16ByteBuffer(catalog), StringToUTF16ByteBuffer(schemaPattern), StringToUTF16ByteBuffer(tableName),  null) != SQL_SUCCESS) {
+            throw new SQLException("getTables() failed");
+        }
 
         return new io.github.jdbc2odbc.ResultSet(statementHandle);
     }
 
     @Override
     public ResultSet getSchemas() throws SQLException {
-        PointerBuffer outHandle = PointerBuffer.allocateDirect(8);
-        SQLAllocHandle(
-                SQL_HANDLE_STMT, connHandle, outHandle);
-        long statementHandle = outHandle.get();
-        ByteBuffer BB_EMPTY = StandardCharsets.UTF_16LE.encode("");
-
-        SQLTables(statementHandle, BB_EMPTY, StandardCharsets.UTF_16LE.encode(SQL_ALL_SCHEMAS), BB_EMPTY,  BB_EMPTY);
-
-        return new io.github.jdbc2odbc.ResultSet(statementHandle);
+        return getSchemas(null, null);
     }
 
     @Override
     public ResultSet getCatalogs() throws SQLException {
-        PointerBuffer outHandle = PointerBuffer.allocateDirect(8);
+        PointerBuffer outHandle = BufferUtils.createPointerBuffer(8);
         SQLAllocHandle(
                 SQL_HANDLE_STMT, connHandle, outHandle);
         long statementHandle = outHandle.get();
-        ByteBuffer BB_EMPTY = StandardCharsets.UTF_16LE.encode("");
 
-        SQLTables(statementHandle, StandardCharsets.UTF_16LE.encode(SQL_ALL_CATALOGS), BB_EMPTY, BB_EMPTY,  BB_EMPTY);
+        SQLTables(statementHandle, BB_ALL, null, null,  null);
 
         return new io.github.jdbc2odbc.ResultSet(statementHandle);
     }
 
     @Override
     public ResultSet getTableTypes() throws SQLException {
-        return null;
+        PointerBuffer outHandle = BufferUtils.createPointerBuffer(8);
+        SQLAllocHandle(
+                SQL_HANDLE_STMT, connHandle, outHandle);
+        long statementHandle = outHandle.get();
+
+        SQLTables(statementHandle, null, null, null,  BB_ALL);
+
+        return new io.github.jdbc2odbc.ResultSet(statementHandle);
     }
 
     @Override
-    public ResultSet getColumns(String s, String s1, String s2, String s3) throws SQLException {
-        return null;
+    public ResultSet getColumns(String catalog, String schemaPattern, String tableNamePattern, String columnNamePatter) throws SQLException {
+        PointerBuffer outHandle = BufferUtils.createPointerBuffer(8);
+        SQLAllocHandle(
+                SQL_HANDLE_STMT, connHandle, outHandle);
+        long statementHandle = outHandle.get();
+
+        BufferUtils bbCatalog, bbSchema, bbTable, bbColumn;
+
+        SQLColumns(statementHandle, StringToUTF16ByteBuffer(catalog), StringToUTF16ByteBuffer(schemaPattern), StringToUTF16ByteBuffer(tableNamePattern),  StringToUTF16ByteBuffer(columnNamePatter));
+        return new io.github.jdbc2odbc.ResultSet(statementHandle);
     }
 
     @Override
@@ -886,8 +907,15 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
     }
 
     @Override
-    public ResultSet getSchemas(String s, String s1) throws SQLException {
-        return null;
+    public ResultSet getSchemas(String catalog, String schemaPattern) throws SQLException {
+        PointerBuffer outHandle = PointerBuffer.allocateDirect(8);
+        SQLAllocHandle(
+                SQL_HANDLE_STMT, connHandle, outHandle);
+        long statementHandle = outHandle.get();
+
+        SQLTables(statementHandle, this.StringToUTF16ByteBuffer(catalog), StringToUTF16ByteBuffer(schemaPattern), null,  null);
+
+        return new io.github.jdbc2odbc.ResultSet(statementHandle);
     }
 
     @Override
@@ -934,4 +962,14 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
     public boolean isWrapperFor(Class<?> aClass) throws SQLException {
         return false;
     }
+
+    private ByteBuffer StringToUTF16ByteBuffer(String s) {
+        if (s == null) {
+            return null;
+        }
+        ByteBuffer bb = BufferUtils.createByteBuffer(s.length()*2);
+        bb.put(s.getBytes(StandardCharsets.UTF_16LE));
+        return bb;
+    }
 }
+

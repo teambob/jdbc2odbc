@@ -30,7 +30,6 @@ public class ResultSet implements java.sql.ResultSet{
         SQLNumResultCols(statementHandle, outNumColumns);
 
         short numColumns = outNumColumns.get();
-        System.out.println("Columns: "+String.valueOf(numColumns));
         for (short index = 1; index< numColumns+1; index++) {
             ByteBuffer outColumnName = BufferUtils.createByteBuffer(1024);
             ShortBuffer outStringLength = BufferUtils.createShortBuffer(4);
@@ -39,17 +38,16 @@ public class ResultSet implements java.sql.ResultSet{
             outColumnName.limit(outStringLength.get());
             String columnName = StandardCharsets.UTF_16LE.decode(outColumnName).toString();
             columnNames.add(columnName);
-
-            System.out.println("Column name: "+columnName);
         }
-        //next();
     }
 
     @Override
     public boolean next() throws SQLException {
-        System.out.println("next()");
         short result = SQLFetch(statementHandle);
-        return result == SQL_SUCCESS;
+        if (result == SQL_ERROR){
+            throw new SQLException("next() failed");
+        }
+        return result != SQL_NO_DATA;
     }
 
     @Override
@@ -63,7 +61,6 @@ public class ResultSet implements java.sql.ResultSet{
 
     @Override
     public String getString(int i) throws SQLException {
-        System.out.println("getString() called");
         // TODO: check index
         ByteBuffer outString = BufferUtils.createByteBuffer(1024); // TODO: make dynamic
         PointerBuffer outStrlen = BufferUtils.createPointerBuffer(8);
@@ -150,7 +147,7 @@ public class ResultSet implements java.sql.ResultSet{
 
     @Override
     public String getString(String s) throws SQLException {
-        return "";
+        return getString(findColumn(s));
     }
 
     @Override
@@ -260,7 +257,7 @@ public class ResultSet implements java.sql.ResultSet{
 
     @Override
     public int findColumn(String s) throws SQLException {
-        return 0;
+        return columnNames.indexOf(s);
     }
 
     @Override
