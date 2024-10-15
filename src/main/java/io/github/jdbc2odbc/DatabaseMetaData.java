@@ -14,15 +14,10 @@ import static org.lwjgl.odbc.SQL.*;
 public class DatabaseMetaData implements java.sql.DatabaseMetaData {
     Connection connection = null;
     Long connHandle = null;
-    ByteBuffer BB_ALL = BufferUtils.createByteBuffer(8);
-
 
     public DatabaseMetaData(Connection connection, long connHandle) {
         this.connection = connection;
         this.connHandle = connHandle;
-        BB_ALL.put(StandardCharsets.UTF_16LE.encode("%"));
-        BB_ALL.limit(1);
-
     }
 
     @Override
@@ -671,7 +666,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
                 SQL_HANDLE_STMT, connHandle, outHandle);
         long statementHandle = outHandle.get();
 
-        SQLTables(statementHandle, BB_ALL, null, null,  null);
+        SQLTables(statementHandle, StringToUTF16ByteBuffer(SQL_ALL_CATALOGS), null, null,  null);
 
         return new io.github.jdbc2odbc.ResultSet(statementHandle);
     }
@@ -683,7 +678,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
                 SQL_HANDLE_STMT, connHandle, outHandle);
         long statementHandle = outHandle.get();
 
-        SQLTables(statementHandle, null, null, null,  BB_ALL);
+        SQLTables(statementHandle, null, null, null,  StringToUTF16ByteBuffer(SQL_ALL_TABLE_TYPES));
 
         return new io.github.jdbc2odbc.ResultSet(statementHandle);
     }
