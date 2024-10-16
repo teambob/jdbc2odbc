@@ -5,16 +5,20 @@ import java.nio.*;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
-import java.util.List;
+import java.util.*;
+
 
 import static org.lwjgl.odbc.SQL.*;
 
 public class ResultSetMetaData implements java.sql.ResultSetMetaData {
     Long statementHandle = null;
     List<String> columnNames = null;
-    public ResultSetMetaData(long statementHandle, List<String> columnNames) throws SQLException {
+    Map<Short, Short> columnMapping = null;
+
+    public ResultSetMetaData(long statementHandle, List<String> columnNames, Map<Short, Short> columnMapping) throws SQLException {
         this.statementHandle = statementHandle;
         this.columnNames = columnNames;
+        this.columnMapping = columnMapping;
     }
 
     @Override
@@ -59,7 +63,12 @@ public class ResultSetMetaData implements java.sql.ResultSetMetaData {
         ByteBuffer outValue = BufferUtils.createByteBuffer(1024);
         ShortBuffer outStringLength = BufferUtils.createShortBuffer(16);
         PointerBuffer outNumericAttributePtr = BufferUtils.createPointerBuffer(16);
-        SQLColAttribute(statementHandle, (short)i, SQL_DESC_DISPLAY_SIZE, outValue, outStringLength, outNumericAttributePtr);
+        SQLColAttribute(statementHandle,
+                (columnMapping != null) ? columnMapping.get((short)i) : (short)i,
+                SQL_DESC_DISPLAY_SIZE,
+                outValue,
+                outStringLength,
+                outNumericAttributePtr);
 
         return outValue.getInt();
     }
@@ -69,7 +78,13 @@ public class ResultSetMetaData implements java.sql.ResultSetMetaData {
         ByteBuffer outColumnName = BufferUtils.createByteBuffer(1024);
         ShortBuffer outStringLength = BufferUtils.createShortBuffer(16);
         PointerBuffer outNumericAttributePtr = BufferUtils.createPointerBuffer(16);
-        SQLColAttribute(statementHandle, (short)i, SQL_DESC_LABEL, outColumnName, outStringLength, outNumericAttributePtr);
+        SQLColAttribute(
+                statementHandle,
+                (columnMapping != null) ? columnMapping.get((short)i) : (short)i,
+                SQL_DESC_LABEL,
+                outColumnName,
+                outStringLength,
+                outNumericAttributePtr);
         outColumnName.limit(outStringLength.get());
         return StandardCharsets.UTF_16LE.decode(outColumnName).toString();
     }
@@ -84,7 +99,13 @@ public class ResultSetMetaData implements java.sql.ResultSetMetaData {
         ByteBuffer outColumnName = BufferUtils.createByteBuffer(1024);
         ShortBuffer outStringLength = BufferUtils.createShortBuffer(16);
         PointerBuffer outNumericAttributePtr = BufferUtils.createPointerBuffer(16);
-        SQLColAttribute(statementHandle, (short)i, SQL_DESC_SCHEMA_NAME, outColumnName, outStringLength, outNumericAttributePtr);
+        SQLColAttribute(
+                statementHandle,
+                (columnMapping != null) ? columnMapping.get((short)i) : (short)i,
+                SQL_DESC_SCHEMA_NAME,
+                outColumnName,
+                outStringLength,
+                outNumericAttributePtr);
         outColumnName.limit(outStringLength.get());
         return StandardCharsets.UTF_16LE.decode(outColumnName).toString();
     }
@@ -94,7 +115,13 @@ public class ResultSetMetaData implements java.sql.ResultSetMetaData {
         ByteBuffer outValue = BufferUtils.createByteBuffer(1024);
         ShortBuffer outStringLength = BufferUtils.createShortBuffer(16);
         PointerBuffer outNumericAttributePtr = BufferUtils.createPointerBuffer(16);
-        SQLColAttribute(statementHandle, (short)i, SQL_DESC_PRECISION, outValue, outStringLength, outNumericAttributePtr);
+        SQLColAttribute(
+                statementHandle,
+                (columnMapping != null) ? columnMapping.get((short)i) : (short)i,
+                SQL_DESC_PRECISION,
+                outValue,
+                outStringLength,
+                outNumericAttributePtr);
 
         return outValue.getInt();
     }
@@ -104,7 +131,13 @@ public class ResultSetMetaData implements java.sql.ResultSetMetaData {
         ByteBuffer outValue = BufferUtils.createByteBuffer(1024);
         ShortBuffer outStringLength = BufferUtils.createShortBuffer(16);
         PointerBuffer outNumericAttributePtr = BufferUtils.createPointerBuffer(16);
-        SQLColAttribute(statementHandle, (short)i, SQL_DESC_SCALE, outValue, outStringLength, outNumericAttributePtr);
+        SQLColAttribute(
+                statementHandle,
+                (columnMapping != null) ? columnMapping.get((short)i) : (short)i,
+                SQL_DESC_SCALE,
+                outValue,
+                outStringLength,
+                outNumericAttributePtr);
 
         return outValue.getInt();
     }
@@ -114,7 +147,12 @@ public class ResultSetMetaData implements java.sql.ResultSetMetaData {
         ByteBuffer outColumnName = BufferUtils.createByteBuffer(1024);
         ShortBuffer outStringLength = BufferUtils.createShortBuffer(16);
         PointerBuffer outNumericAttributePtr = BufferUtils.createPointerBuffer(16);
-        SQLColAttribute(statementHandle, (short)i, SQL_DESC_TABLE_NAME, outColumnName, outStringLength, outNumericAttributePtr);
+        SQLColAttribute(statementHandle,
+                (columnMapping != null) ? columnMapping.get((short)i) : (short)i,
+                SQL_DESC_TABLE_NAME,
+                outColumnName,
+                outStringLength,
+                outNumericAttributePtr);
         outColumnName.limit(outStringLength.get());
         return StandardCharsets.UTF_16LE.decode(outColumnName).toString();
     }
@@ -124,7 +162,13 @@ public class ResultSetMetaData implements java.sql.ResultSetMetaData {
         ByteBuffer outColumnName = BufferUtils.createByteBuffer(1024);
         ShortBuffer outStringLength = BufferUtils.createShortBuffer(16);
         PointerBuffer outNumericAttributePtr = BufferUtils.createPointerBuffer(16);
-        SQLColAttribute(statementHandle, (short)i, SQL_DESC_CATALOG_NAME, outColumnName, outStringLength, outNumericAttributePtr);
+        SQLColAttribute(
+                statementHandle,
+                (columnMapping != null) ? columnMapping.get((short)i) : (short)i,
+                SQL_DESC_CATALOG_NAME,
+                outColumnName,
+                outStringLength,
+                outNumericAttributePtr);
         outColumnName.limit(outStringLength.get());
         return StandardCharsets.UTF_16LE.decode(outColumnName).toString();
     }
@@ -134,7 +178,13 @@ public class ResultSetMetaData implements java.sql.ResultSetMetaData {
         ByteBuffer outValue = BufferUtils.createByteBuffer(1024);
         ShortBuffer outStringLength = BufferUtils.createShortBuffer(16);
         PointerBuffer outNumericAttributePtr = BufferUtils.createPointerBuffer(16);
-        SQLColAttribute(statementHandle, (short)i, SQL_DESC_TYPE, outValue, outStringLength, outNumericAttributePtr);
+        SQLColAttribute(
+                statementHandle,
+                (columnMapping != null) ? columnMapping.get((short)i) : (short)i,
+                SQL_DESC_TYPE,
+                outValue,
+                outStringLength,
+                outNumericAttributePtr);
         int type = (int)outNumericAttributePtr.get();
         System.out.print("column type: ");
         System.out.println(type);
@@ -147,7 +197,13 @@ public class ResultSetMetaData implements java.sql.ResultSetMetaData {
         ByteBuffer outColumnName = BufferUtils.createByteBuffer(1024);
         ShortBuffer outStringLength = BufferUtils.createShortBuffer(16);
         PointerBuffer outNumericAttributePtr = BufferUtils.createPointerBuffer(16);
-        SQLColAttribute(statementHandle, (short)i, SQL_DESC_TYPE_NAME, outColumnName, outStringLength, outNumericAttributePtr);
+        SQLColAttribute(
+                statementHandle,
+                (columnMapping != null) ? columnMapping.get((short)i) : (short)i,
+                SQL_DESC_TYPE_NAME,
+                outColumnName,
+                outStringLength,
+                outNumericAttributePtr);
         outColumnName.limit(outStringLength.get());
         String type = StandardCharsets.UTF_16LE.decode(outColumnName).toString();
         System.out.print("column type: ");

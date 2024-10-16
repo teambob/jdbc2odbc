@@ -6,39 +6,66 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.net.URL;
-import java.nio.ByteBuffer;
-import java.nio.LongBuffer;
-import java.nio.ShortBuffer;
+import java.nio.*;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
+import java.sql.Date;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.HashMap;
+
 import static org.lwjgl.odbc.SQL.*;
 
 public class ResultSet implements java.sql.ResultSet{
     Long statementHandle = null;
     List<String> columnNames = new ArrayList<String>();
+    Map<Short, Short> columnMapping; // Key=JDBC column, value = ODBC column
 
     public ResultSet(Long statementHandle) throws SQLException {
+        this(statementHandle, null);
+    }
+
+    public ResultSet(Long statementHandle, Map<Short, Short> columnMapping) throws SQLException {
         this.statementHandle = statementHandle;
+        this.columnMapping = columnMapping;
 
 
         ShortBuffer outNumColumns = BufferUtils.createShortBuffer(4);
         SQLNumResultCols(statementHandle, outNumColumns);
 
         short numColumns = outNumColumns.get();
-        for (short index = 1; index< numColumns+1; index++) {
-            ByteBuffer outColumnName = BufferUtils.createByteBuffer(1024);
-            ShortBuffer outStringLength = BufferUtils.createShortBuffer(4);
-            PointerBuffer outNumericAttributePtr = BufferUtils.createPointerBuffer(8);
-            SQLColAttribute(statementHandle, index, SQL_DESC_NAME, outColumnName, outStringLength, outNumericAttributePtr);
-            outColumnName.limit(outStringLength.get());
-            String columnName = StandardCharsets.UTF_16LE.decode(outColumnName).toString();
-            columnNames.add(columnName);
+        if (columnMapping!=null) {
+            columnNames = new ArrayList<String>(columnMapping.size());
+            for (Map.Entry<Short, Short> entry : columnMapping.entrySet()) {
+                ByteBuffer outColumnName = BufferUtils.createByteBuffer(1024);
+                ShortBuffer outStringLength = BufferUtils.createShortBuffer(4);
+                PointerBuffer outNumericAttributePtr = BufferUtils.createPointerBuffer(8);
+                SQLColAttribute(statementHandle, entry.getValue(), SQL_DESC_NAME, outColumnName, outStringLength, outNumericAttributePtr);
+                outColumnName.limit(outStringLength.get());
+                String columnName = StandardCharsets.UTF_16LE.decode(outColumnName).toString();
+                columnNames.add(entry.getKey()-1, columnName);
+            }
         }
+        else {
+            for (short index = 1; index< numColumns+1; index++) {
+                ByteBuffer outColumnName = BufferUtils.createByteBuffer(1024);
+                ShortBuffer outStringLength = BufferUtils.createShortBuffer(4);
+                PointerBuffer outNumericAttributePtr = BufferUtils.createPointerBuffer(8);
+                SQLColAttribute(statementHandle, index, SQL_DESC_NAME, outColumnName, outStringLength, outNumericAttributePtr);
+                outColumnName.limit(outStringLength.get());
+                String columnName = StandardCharsets.UTF_16LE.decode(outColumnName).toString();
+                columnNames.add(columnName);
+            }
+        }
+    }
+
+    private Short getKey(Short value) throws NoSuchElementException{
+        for (Map.Entry<Short, Short> entry : columnMapping.entrySet()) {
+            if (entry.getValue().equals(value)) {
+                return entry.getKey();
+            }
+        }
+        throw new NoSuchElementException();
     }
 
     @Override
@@ -65,9 +92,12 @@ public class ResultSet implements java.sql.ResultSet{
         ByteBuffer outString = BufferUtils.createByteBuffer(1024); // TODO: make dynamic
         PointerBuffer outStrlen = BufferUtils.createPointerBuffer(8);
 
-        SQLGetData(statementHandle, (short)i, SQL_C_WCHAR, outString, outStrlen);
+        short index = columnMapping != null ? columnMapping.getOrDefault((short)i, (short)i) : (short)i;
+
+        SQLGetData(statementHandle, index, SQL_C_WCHAR, outString, outStrlen);
         outString.limit((int) outStrlen.get());
-        return StandardCharsets.UTF_16LE.decode(outString).toString();
+        String s = StandardCharsets.UTF_16LE.decode(outString).toString();
+        return s;
     }
 
     @Override
@@ -242,7 +272,7 @@ public class ResultSet implements java.sql.ResultSet{
 
     @Override
     public ResultSetMetaData getMetaData() throws SQLException {
-        return new ResultSetMetaData(statementHandle, columnNames);
+        return new ResultSetMetaData(statementHandle, columnNames, columnMapping);
     }
 
     @Override
@@ -257,7 +287,7 @@ public class ResultSet implements java.sql.ResultSet{
 
     @Override
     public int findColumn(String s) throws SQLException {
-        return columnNames.indexOf(s);
+        return columnNames.indexOf(s)+1;
     }
 
     @Override

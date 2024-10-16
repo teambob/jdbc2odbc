@@ -46,7 +46,18 @@ class DriverTest {
         assertNotNull(cursor);
         DatabaseMetaData metadata = cursor.getMetaData();
         assertNotNull(metadata);
-        ResultSet rs = metadata.getTables(null, null, null, new String[]{"TABLE"});
+
+
+        ResultSet rs = metadata.getTableTypes();
+
+        System.out.println("Table types");
+        while (rs.next()) {
+            System.out.print("Table type:");
+            System.out.println(rs.getString(1));
+        }
+
+
+        rs = metadata.getTables(null, null, null, new String[]{"TABLE"});
 
         System.out.println("Tables");
         while (rs.next()) {

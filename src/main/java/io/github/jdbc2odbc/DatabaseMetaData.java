@@ -1,6 +1,7 @@
 package io.github.jdbc2odbc;
 
 import org.lwjgl.*;
+import org.lwjgl.system.Checks;
 import org.lwjgl.system.MemoryUtil;
 
 import java.nio.ByteBuffer;
@@ -8,12 +9,15 @@ import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.lwjgl.odbc.SQL.*;
 
 public class DatabaseMetaData implements java.sql.DatabaseMetaData {
     Connection connection = null;
     Long connHandle = null;
+    ByteBuffer BB_EMPTY = StringToUTF16ByteBuffer("");
 
     public DatabaseMetaData(Connection connection, long connHandle) {
         this.connection = connection;
@@ -633,6 +637,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
 
     @Override
     public ResultSet getTables(String catalog, String schemaPattern, String tableNamePattern, String[] types) throws SQLException {
+        System.out.println("getTables()");
         PointerBuffer outHandle = BufferUtils.createPointerBuffer(8);
         if (SQLAllocHandle(
                 SQL_HANDLE_STMT, connHandle, outHandle) != SQL_SUCCESS) {
@@ -661,6 +666,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
 
     @Override
     public ResultSet getCatalogs() throws SQLException {
+        System.out.println("getCatalogs()");
         PointerBuffer outHandle = BufferUtils.createPointerBuffer(8);
         SQLAllocHandle(
                 SQL_HANDLE_STMT, connHandle, outHandle);
@@ -674,13 +680,19 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
     @Override
     public ResultSet getTableTypes() throws SQLException {
         PointerBuffer outHandle = BufferUtils.createPointerBuffer(8);
-        SQLAllocHandle(
-                SQL_HANDLE_STMT, connHandle, outHandle);
+        if (SQLAllocHandle(
+                SQL_HANDLE_STMT, connHandle, outHandle) != SQL_SUCCESS) {
+            throw new SQLException("getTableTypes() failed");
+        }
         long statementHandle = outHandle.get();
 
-        SQLTables(statementHandle, null, null, null,  StringToUTF16ByteBuffer(SQL_ALL_TABLE_TYPES));
+        if (SQLTables(statementHandle, StringToUTF16ByteBuffer(""), StringToUTF16ByteBuffer(""), StringToUTF16ByteBuffer(""),  StringToUTF16ByteBuffer(SQL_ALL_TABLE_TYPES))!=SQL_SUCCESS) {
+            throw new SQLException("getTableTypes() failed");
+        };
+        Map<Short, Short> columnMapping = new HashMap<>();
+        columnMapping.put((short)1, (short)4);
 
-        return new io.github.jdbc2odbc.ResultSet(statementHandle);
+        return new io.github.jdbc2odbc.ResultSet(statementHandle, columnMapping);
     }
 
     @Override
@@ -903,14 +915,17 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
 
     @Override
     public ResultSet getSchemas(String catalog, String schemaPattern) throws SQLException {
+        System.out.println("getSchemas()");
         PointerBuffer outHandle = PointerBuffer.allocateDirect(8);
         SQLAllocHandle(
                 SQL_HANDLE_STMT, connHandle, outHandle);
         long statementHandle = outHandle.get();
 
         SQLTables(statementHandle, this.StringToUTF16ByteBuffer(catalog), StringToUTF16ByteBuffer(schemaPattern), null,  null);
-
-        return new io.github.jdbc2odbc.ResultSet(statementHandle);
+        Map<Short, Short> schemaMap = new HashMap<Short, Short>();
+        schemaMap.put((short)2, (short)1); // TABLE_SCHEM is column 1
+        schemaMap.put((short)1, (short)2); // TABLE_CATALOG is column 2
+        return new io.github.jdbc2odbc.ResultSet(statementHandle, schemaMap);
     }
 
     @Override
@@ -962,8 +977,10 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         if (s == null) {
             return null;
         }
-        ByteBuffer bb = BufferUtils.createByteBuffer(s.length()*2);
+        ByteBuffer bb = BufferUtils.createByteBuffer((s.length()+1)*2);
         bb.put(s.getBytes(StandardCharsets.UTF_16LE));
+        bb.put((byte) 0);
+        bb.position(0);
         return bb;
     }
 }
