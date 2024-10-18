@@ -2,6 +2,10 @@ package io.github.jdbc2odbc;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.PointerBuffer;
 
+import com.jcabi.aspects.Loggable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
@@ -17,6 +21,7 @@ import java.util.HashMap;
 import static org.lwjgl.odbc.SQL.*;
 
 public class ResultSet implements java.sql.ResultSet{
+    private static Logger LOGGER = LoggerFactory.getLogger(ResultSet.class);
     Long statementHandle = null;
     List<String> columnNames = new ArrayList<String>();
     Map<Short, Short> columnMapping; // Key=JDBC column, value = ODBC column
@@ -69,6 +74,7 @@ public class ResultSet implements java.sql.ResultSet{
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public boolean next() throws SQLException {
         short result = SQLFetch(statementHandle);
         if (result == SQL_ERROR){
@@ -78,16 +84,20 @@ public class ResultSet implements java.sql.ResultSet{
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void close() throws SQLException {
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public boolean wasNull() throws SQLException {
         return false;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public String getString(int i) throws SQLException {
+        System.out.printf("getString(%d)%n", i);
         // TODO: check index
         ByteBuffer outString = BufferUtils.createByteBuffer(1024); // TODO: make dynamic
         PointerBuffer outStrlen = BufferUtils.createPointerBuffer(8);
@@ -101,936 +111,1124 @@ public class ResultSet implements java.sql.ResultSet{
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public boolean getBoolean(int i) throws SQLException {
         return false;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public byte getByte(int i) throws SQLException {
         return 0;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public short getShort(int i) throws SQLException {
         return 0;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public int getInt(int i) throws SQLException {
         return 0;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public long getLong(int i) throws SQLException {
         return 0;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public float getFloat(int i) throws SQLException {
         return 0;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public double getDouble(int i) throws SQLException {
         return 0;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public BigDecimal getBigDecimal(int i, int i1) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public byte[] getBytes(int i) throws SQLException {
         return new byte[0];
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public Date getDate(int i) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public Time getTime(int i) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public Timestamp getTimestamp(int i) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public InputStream getAsciiStream(int i) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public InputStream getUnicodeStream(int i) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public InputStream getBinaryStream(int i) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public String getString(String s) throws SQLException {
+        System.out.printf("getString(%s)%n", s);
         return getString(findColumn(s));
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public boolean getBoolean(String s) throws SQLException {
         return false;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public byte getByte(String s) throws SQLException {
         return 0;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public short getShort(String s) throws SQLException {
         return 0;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public int getInt(String s) throws SQLException {
         return 0;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public long getLong(String s) throws SQLException {
         return 0;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public float getFloat(String s) throws SQLException {
         return 0;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public double getDouble(String s) throws SQLException {
         return 0;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public BigDecimal getBigDecimal(String s, int i) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public byte[] getBytes(String s) throws SQLException {
         return new byte[0];
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public Date getDate(String s) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public Time getTime(String s) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public Timestamp getTimestamp(String s) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public InputStream getAsciiStream(String s) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public InputStream getUnicodeStream(String s) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public InputStream getBinaryStream(String s) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public SQLWarning getWarnings() throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void clearWarnings() throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public String getCursorName() throws SQLException {
         return "";
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public ResultSetMetaData getMetaData() throws SQLException {
         return new ResultSetMetaData(statementHandle, columnNames, columnMapping);
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public Object getObject(int i) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public Object getObject(String s) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public int findColumn(String s) throws SQLException {
         return columnNames.indexOf(s)+1;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public Reader getCharacterStream(int i) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public Reader getCharacterStream(String s) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public BigDecimal getBigDecimal(int i) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public BigDecimal getBigDecimal(String s) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public boolean isBeforeFirst() throws SQLException {
         return false;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public boolean isAfterLast() throws SQLException {
         return false;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public boolean isFirst() throws SQLException {
         return false;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public boolean isLast() throws SQLException {
         return false;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void beforeFirst() throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void afterLast() throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public boolean first() throws SQLException {
         return false;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public boolean last() throws SQLException {
         return false;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public int getRow() throws SQLException {
         return 0;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public boolean absolute(int i) throws SQLException {
         return false;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public boolean relative(int i) throws SQLException {
         return false;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public boolean previous() throws SQLException {
         return false;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void setFetchDirection(int i) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public int getFetchDirection() throws SQLException {
         return 0;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void setFetchSize(int i) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public int getFetchSize() throws SQLException {
         return 0;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public int getType() throws SQLException {
         return 0;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public int getConcurrency() throws SQLException {
         return 0;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public boolean rowUpdated() throws SQLException {
         return false;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public boolean rowInserted() throws SQLException {
         return false;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public boolean rowDeleted() throws SQLException {
         return false;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateNull(int i) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateBoolean(int i, boolean b) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateByte(int i, byte b) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateShort(int i, short i1) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateInt(int i, int i1) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateLong(int i, long l) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateFloat(int i, float v) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateDouble(int i, double v) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateBigDecimal(int i, BigDecimal bigDecimal) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateString(int i, String s) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateBytes(int i, byte[] bytes) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateDate(int i, Date date) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateTime(int i, Time time) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateTimestamp(int i, Timestamp timestamp) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateAsciiStream(int i, InputStream inputStream, int i1) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateBinaryStream(int i, InputStream inputStream, int i1) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateCharacterStream(int i, Reader reader, int i1) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateObject(int i, Object o, int i1) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateObject(int i, Object o) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateNull(String s) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateBoolean(String s, boolean b) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateByte(String s, byte b) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateShort(String s, short i) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateInt(String s, int i) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateLong(String s, long l) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateFloat(String s, float v) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateDouble(String s, double v) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateBigDecimal(String s, BigDecimal bigDecimal) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateString(String s, String s1) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateBytes(String s, byte[] bytes) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateDate(String s, Date date) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateTime(String s, Time time) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateTimestamp(String s, Timestamp timestamp) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateAsciiStream(String s, InputStream inputStream, int i) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateBinaryStream(String s, InputStream inputStream, int i) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateCharacterStream(String s, Reader reader, int i) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateObject(String s, Object o, int i) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateObject(String s, Object o) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void insertRow() throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateRow() throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void deleteRow() throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void refreshRow() throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void cancelRowUpdates() throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void moveToInsertRow() throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void moveToCurrentRow() throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public Statement getStatement() throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public Object getObject(int i, Map<String, Class<?>> map) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public Ref getRef(int i) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public Blob getBlob(int i) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public Clob getClob(int i) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public Array getArray(int i) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public Object getObject(String s, Map<String, Class<?>> map) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public Ref getRef(String s) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public Blob getBlob(String s) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public Clob getClob(String s) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public Array getArray(String s) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public Date getDate(int i, Calendar calendar) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public Date getDate(String s, Calendar calendar) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public Time getTime(int i, Calendar calendar) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public Time getTime(String s, Calendar calendar) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public Timestamp getTimestamp(int i, Calendar calendar) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public Timestamp getTimestamp(String s, Calendar calendar) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public URL getURL(int i) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public URL getURL(String s) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateRef(int i, Ref ref) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateRef(String s, Ref ref) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateBlob(int i, Blob blob) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateBlob(String s, Blob blob) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateClob(int i, Clob clob) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateClob(String s, Clob clob) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateArray(int i, Array array) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateArray(String s, Array array) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public RowId getRowId(int i) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public RowId getRowId(String s) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateRowId(int i, RowId rowId) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateRowId(String s, RowId rowId) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public int getHoldability() throws SQLException {
         return 0;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public boolean isClosed() throws SQLException {
         return false;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateNString(int i, String s) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateNString(String s, String s1) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateNClob(int i, NClob nClob) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateNClob(String s, NClob nClob) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public NClob getNClob(int i) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public NClob getNClob(String s) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public SQLXML getSQLXML(int i) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public SQLXML getSQLXML(String s) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateSQLXML(int i, SQLXML sqlxml) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateSQLXML(String s, SQLXML sqlxml) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public String getNString(int i) throws SQLException {
         return "";
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public String getNString(String s) throws SQLException {
         return "";
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public Reader getNCharacterStream(int i) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public Reader getNCharacterStream(String s) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateNCharacterStream(int i, Reader reader, long l) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateNCharacterStream(String s, Reader reader, long l) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateAsciiStream(int i, InputStream inputStream, long l) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateBinaryStream(int i, InputStream inputStream, long l) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateCharacterStream(int i, Reader reader, long l) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateAsciiStream(String s, InputStream inputStream, long l) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateBinaryStream(String s, InputStream inputStream, long l) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateCharacterStream(String s, Reader reader, long l) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateBlob(int i, InputStream inputStream, long l) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateBlob(String s, InputStream inputStream, long l) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateClob(int i, Reader reader, long l) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateClob(String s, Reader reader, long l) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateNClob(int i, Reader reader, long l) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateNClob(String s, Reader reader, long l) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateNCharacterStream(int i, Reader reader) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateNCharacterStream(String s, Reader reader) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateAsciiStream(int i, InputStream inputStream) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateBinaryStream(int i, InputStream inputStream) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateCharacterStream(int i, Reader reader) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateAsciiStream(String s, InputStream inputStream) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateBinaryStream(String s, InputStream inputStream) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateCharacterStream(String s, Reader reader) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateBlob(int i, InputStream inputStream) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateBlob(String s, InputStream inputStream) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateClob(int i, Reader reader) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateClob(String s, Reader reader) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateNClob(int i, Reader reader) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public void updateNClob(String s, Reader reader) throws SQLException {
 
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public <T> T getObject(int i, Class<T> aClass) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public <T> T getObject(String s, Class<T> aClass) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public <T> T unwrap(Class<T> aClass) throws SQLException {
         return null;
     }
 
     @Override
+    @Loggable(Loggable.TRACE)
     public boolean isWrapperFor(Class<?> aClass) throws SQLException {
         return false;
     }

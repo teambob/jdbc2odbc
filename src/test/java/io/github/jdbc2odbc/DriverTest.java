@@ -19,14 +19,14 @@ class DriverTest {
     void connect() throws SQLException {
         Driver driver = new Driver();
         assertTrue(driver != null);
-        Connection cursor = driver.connect("abc", new Properties());
+        Connection cursor = driver.connect("jdbc:odbc://abc", new Properties());
         assertTrue(cursor != null);
     }
     @org.junit.jupiter.api.Test
     void query() throws SQLException {
         Driver driver = new Driver();
         assertTrue(driver != null);
-        Connection cursor = driver.connect("abc", new Properties());
+        Connection cursor = driver.connect("jdbc:odbc://abc", new Properties());
         assertTrue(cursor != null);
         java.sql.Statement statement = cursor.createStatement();
         assertTrue(statement != null);
@@ -42,7 +42,7 @@ class DriverTest {
     void getTables() throws SQLException {
         Driver driver = new Driver();
         assertNotNull(driver);
-        Connection cursor = driver.connect("abc", new Properties());
+        Connection cursor = driver.connect("jdbc:odbc://abc", new Properties());
         assertNotNull(cursor);
         DatabaseMetaData metadata = cursor.getMetaData();
         assertNotNull(metadata);
@@ -73,7 +73,7 @@ class DriverTest {
     void getCatalogs() throws SQLException {
         Driver driver = new Driver();
         assertNotNull(driver);
-        Connection cursor = driver.connect("abc", new Properties());
+        Connection cursor = driver.connect("jdbc:odbc://abc", new Properties());
         assertNotNull(cursor);
         DatabaseMetaData metadata = cursor.getMetaData();
         assertNotNull(metadata);

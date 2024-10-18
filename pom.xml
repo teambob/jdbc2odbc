@@ -101,7 +101,22 @@
                 <version>5.11.0</version>
                 <scope>test</scope>
             </dependency>
-
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-simple</artifactId>
+                <version>2.0.16</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.jcabi</groupId>
+                <artifactId>jcabi-aspects</artifactId>
+                <version>LATEST</version>
+            </dependency>
+            <dependency>
+                <groupId>org.aspectj</groupId>
+                <artifactId>aspectjrt</artifactId>
+                <version>LATEST</version>
+            </dependency>
         </dependencies>
     <!--</dependencyManagement>-->
     <build>
@@ -124,6 +139,19 @@
                             <phase>package</phase>
                             <goals>
                                 <goal>shade</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>com.jcabi</groupId>
+                    <artifactId>jcabi-maven-plugin</artifactId>
+                    <version>0.17.0</version>
+
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>ajc</goal>
                             </goals>
                         </execution>
                     </executions>
