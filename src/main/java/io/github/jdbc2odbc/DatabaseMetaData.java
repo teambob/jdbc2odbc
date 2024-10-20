@@ -751,7 +751,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
                 StandardCharsets.UTF_16LE.encode(schemaPattern),
                 StandardCharsets.UTF_16LE.encode(procedureNamePattern)
         );
-        return new io.github.jdbc2odbc.ResultSet(statementHandle);
+        return new io.github.jdbc2odbc.ResultSet(null, statementHandle);
     }
 
     @Override
@@ -782,7 +782,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
             throw new SQLException("getTables() failed");
         }
 
-        return new io.github.jdbc2odbc.ResultSet(statementHandle);
+        return new io.github.jdbc2odbc.ResultSet(null, statementHandle);
     }
 
     @Override
@@ -802,7 +802,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
 
         SQLTables(statementHandle, StringToUTF16ByteBuffer(SQL_ALL_CATALOGS), null, null,  null);
 
-        return new io.github.jdbc2odbc.ResultSet(statementHandle);
+        return new io.github.jdbc2odbc.ResultSet(null, statementHandle);
     }
 
     @Override
@@ -821,7 +821,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         Map<Short, Short> columnMapping = new HashMap<>();
         columnMapping.put((short)1, (short)4);
 
-        return new io.github.jdbc2odbc.ResultSet(statementHandle, columnMapping);
+        return new io.github.jdbc2odbc.ResultSet(null, statementHandle, columnMapping);
     }
 
     @Override
@@ -835,7 +835,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         BufferUtils bbCatalog, bbSchema, bbTable, bbColumn;
 
         SQLColumns(statementHandle, StringToUTF16ByteBuffer(catalog), StringToUTF16ByteBuffer(schemaPattern), StringToUTF16ByteBuffer(tableNamePattern),  StringToUTF16ByteBuffer(columnNamePatter));
-        return new io.github.jdbc2odbc.ResultSet(statementHandle);
+        return new io.github.jdbc2odbc.ResultSet(null, statementHandle);
     }
 
     @Override
@@ -1097,7 +1097,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         Map<Short, Short> schemaMap = new HashMap<Short, Short>();
         schemaMap.put((short)2, (short)1); // TABLE_SCHEM is column 1
         schemaMap.put((short)1, (short)2); // TABLE_CATALOG is column 2
-        return new io.github.jdbc2odbc.ResultSet(statementHandle, schemaMap);
+        return new io.github.jdbc2odbc.ResultSet(null, statementHandle, schemaMap);
     }
 
     @Override

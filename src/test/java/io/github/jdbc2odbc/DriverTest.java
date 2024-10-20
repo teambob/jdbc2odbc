@@ -18,21 +18,22 @@ class DriverTest {
     @org.junit.jupiter.api.Test
     void connect() throws SQLException {
         Driver driver = new Driver();
-        assertTrue(driver != null);
+        assertNotNull(driver);
         Connection cursor = driver.connect("jdbc:odbc://abc", new Properties());
-        assertTrue(cursor != null);
+        assertNotNull(cursor);
     }
     @org.junit.jupiter.api.Test
     void query() throws SQLException {
         Driver driver = new Driver();
-        assertTrue(driver != null);
+        assertNotNull(driver);
         Connection cursor = driver.connect("jdbc:odbc://abc", new Properties());
-        assertTrue(cursor != null);
+        assertNotNull(cursor);
         java.sql.Statement statement = cursor.createStatement();
-        assertTrue(statement != null);
+        assertNotNull(statement);
         ResultSet results = statement.executeQuery("select * from test");
-        assertTrue(results != null);
-        System.out.println(results.getString(1));
+        assertNotNull(results);
+        results.next();
+        //System.out.println("Column 1 = "+results.getString(1));
         System.out.println(results.getString("key"));
         System.out.println(results.getString(2));
         System.out.println(results.getMetaData().getColumnCount());

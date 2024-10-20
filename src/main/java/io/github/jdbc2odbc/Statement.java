@@ -18,6 +18,7 @@ import static org.lwjgl.odbc.SQL.*;
 
 
 public class Statement implements java.sql.Statement{
+    private static Logger LOGGER = LoggerFactory.getLogger(Statement.class);
     Long statementHandle = null;
     public Statement(Long connHandle) throws SQLException{
         PointerBuffer outHandle = PointerBuffer.allocateDirect(8);
@@ -127,7 +128,7 @@ public class Statement implements java.sql.Statement{
     @Override
     @Loggable(Loggable.TRACE)
     public ResultSet getResultSet() throws SQLException {
-        return new io.github.jdbc2odbc.ResultSet(statementHandle);
+        return new io.github.jdbc2odbc.ResultSet(this, statementHandle);
     }
 
     @Override
