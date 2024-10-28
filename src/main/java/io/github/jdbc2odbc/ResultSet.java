@@ -3,6 +3,9 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.PointerBuffer;
 
 import com.jcabi.aspects.Loggable;
+import org.lwjgl.odbc.SQL_DATE_STRUCT;
+import org.lwjgl.odbc.SQL_TIMESTAMP_STRUCT;
+import org.lwjgl.odbc.SQL_TIME_STRUCT;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +22,7 @@ import java.util.*;
 import java.util.HashMap;
 
 import static org.lwjgl.odbc.SQL.*;
+import org.lwjgl.odbc.*;
 
 // Data types: https://learn.microsoft.com/en-us/sql/odbc/reference/appendixes/c-data-types?view=sql-server-ver16
 
@@ -198,19 +202,53 @@ public class ResultSet implements java.sql.ResultSet{
     @Override
     @Loggable(Loggable.TRACE)
     public Date getDate(int i) throws SQLException {
-        throw new SQLFeatureNotSupportedException("getDate()");
+        ByteBuffer outValue =  BufferUtils.createByteBuffer(1024); // TODO: make dynamic
+
+        PointerBuffer outStrlen = BufferUtils.createPointerBuffer(8);
+
+        short index = columnMapping != null ? columnMapping.getOrDefault((short)i, (short)i) : (short)i;
+
+        SQLGetData(statementHandle, index, SQL_C_SHORT, outValue, outStrlen);
+        SQL_DATE_STRUCT odbcDate = new SQL_DATE_STRUCT(outValue);
+
+        Date jdbcDate = new Date(odbcDate.year(), odbcDate.month(), odbcDate.day());
+
+        return jdbcDate;
     }
 
     @Override
     @Loggable(Loggable.TRACE)
     public Time getTime(int i) throws SQLException {
-        throw new SQLFeatureNotSupportedException("getTime()");
+        ByteBuffer outValue =  BufferUtils.createByteBuffer(1024); // TODO: make dynamic
+
+        PointerBuffer outStrlen = BufferUtils.createPointerBuffer(8);
+
+        short index = columnMapping != null ? columnMapping.getOrDefault((short)i, (short)i) : (short)i;
+
+        SQLGetData(statementHandle, index, SQL_C_SHORT, outValue, outStrlen);
+        SQL_TIME_STRUCT odbcTime = new SQL_TIME_STRUCT(outValue);
+
+        Time jdbcTime = new Time(odbcTime.hour(), odbcTime.minute(), odbcTime.second());
+
+        return jdbcTime;
+
     }
 
     @Override
     @Loggable(Loggable.TRACE)
     public Timestamp getTimestamp(int i) throws SQLException {
-        throw new SQLFeatureNotSupportedException("getTimestamp()");
+        ByteBuffer outValue =  BufferUtils.createByteBuffer(1024); // TODO: make dynamic
+
+        PointerBuffer outStrlen = BufferUtils.createPointerBuffer(8);
+
+        short index = columnMapping != null ? columnMapping.getOrDefault((short)i, (short)i) : (short)i;
+
+        SQLGetData(statementHandle, index, SQL_C_SHORT, outValue, outStrlen);
+        SQL_TIMESTAMP_STRUCT odbcTime = new SQL_TIMESTAMP_STRUCT(outValue);
+
+        Timestamp jdbcTime = new Timestamp(odbcTime.year(), odbcTime.month(), odbcTime.day(), odbcTime.hour(), odbcTime.minute(), odbcTime.second(), odbcTime.fraction());
+
+        return jdbcTime;
     }
 
     @Override
@@ -354,7 +392,7 @@ public class ResultSet implements java.sql.ResultSet{
     @Override
     @Loggable(Loggable.TRACE)
     public Object getObject(int i) throws SQLException {
-        throw new SQLFeatureNotSupportedException("getObject()");
+        return getString(i);
     }
 
     @Override
@@ -467,26 +505,26 @@ public class ResultSet implements java.sql.ResultSet{
 
     @Override
     @Loggable(Loggable.TRACE)
-    public void setFetchDirection(int i) throws SQLException {
-        throw new SQLFeatureNotSupportedException("setFetchDirection()");
-    }
-
-    @Override
-    @Loggable(Loggable.TRACE)
     public int getFetchDirection() throws SQLException {
         throw new SQLFeatureNotSupportedException("getFetchDirection()");
     }
 
     @Override
     @Loggable(Loggable.TRACE)
-    public void setFetchSize(int i) throws SQLException {
-        throw new SQLFeatureNotSupportedException("setFetchSize()");
+    public void setFetchDirection(int i) throws SQLException {
+        throw new SQLFeatureNotSupportedException("setFetchDirection()");
     }
 
     @Override
     @Loggable(Loggable.TRACE)
     public int getFetchSize() throws SQLException {
         throw new SQLFeatureNotSupportedException("getFetchSize()");
+    }
+
+    @Override
+    @Loggable(Loggable.TRACE)
+    public void setFetchSize(int i) throws SQLException {
+        throw new SQLFeatureNotSupportedException("setFetchSize()");
     }
 
     @Override

@@ -33,10 +33,12 @@ class DriverTest {
         ResultSet results = statement.executeQuery("select * from test");
         assertNotNull(results);
         results.next();
+
+        System.out.println("Column count = "+results.getMetaData().getColumnCount());
         //System.out.println("Column 1 = "+results.getString(1));
-        System.out.println(results.getString("key"));
-        System.out.println(results.getString(2));
-        System.out.println(results.getMetaData().getColumnCount());
+        //System.out.println("Column 1 = "+results.getString(1));
+        System.out.println("Column key = "+results.getString("key"));
+        System.out.println("Column 2 = "+results.getString(2));
     }
 
     @org.junit.jupiter.api.Test
