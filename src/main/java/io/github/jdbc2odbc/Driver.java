@@ -18,6 +18,8 @@ import org.lwjgl.odbc.SQL;
 import org.lwjgl.*;
 import static org.lwjgl.system.Configuration.*;
 
+import org.apache.commons.lang3.*;
+
 /*
     URL reference: https://download.oracle.com/otn_hosted_doc/jdeveloper/904preview/jdk14doc/docs/guide/jdbc/getstart/bridge.doc.html
     The Bridge driver uses the odbc subprotocol. URLs for this subprotocol are of the form:
@@ -33,7 +35,9 @@ public class Driver implements java.sql.Driver {
     private static Logger LOGGER = LoggerFactory.getLogger(Driver.class);
     Long envHandle = null;
     public Driver() throws SQLException {
-        ODBC_LIBRARY_NAME.set("libodbc.so.2");
+        if (SystemUtils.IS_OS_UNIX) {
+            ODBC_LIBRARY_NAME.set("libodbc.so.2");
+        }
         PointerBuffer outHandle = PointerBuffer.allocateDirect(8);
 
         //TODO: close driver handle
