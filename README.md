@@ -15,3 +15,5 @@ For example:
     jdbc:odbc:mydb;UID=me;PWD=secret
     jdbc:odbc:ora123;Cachesize=300
 
+To enable debugging set the system property:
+org.slf4j.simpleLogger.log.io.github.jdbc2odbc=trace
