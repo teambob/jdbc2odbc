@@ -1,6 +1,6 @@
 # jdbc2odbc
 ## Overview
-Open source JDBC-ODBC bridge driver. Allows you to open ODBC datasources from Java as a JDBC driver
+Open source JDBC-ODBC bridge driver. This library allows JDBC clients to access ODBC databases. There are closed sourced libraries that offer similar functionality but no open source libraries that I can find.
 
 This project should be considered ALPHA and should not be used for production. Not all functions are supported and not all unsupported functions throw SQLFeatureNotSupportedException. Run with " -Dorg.slf4j.simpleLogger.log.io.github.jdbc2odbc=trace" to find out what functions are being used
 
@@ -17,3 +17,7 @@ For example:
 
 To enable debugging set the system property:
 org.slf4j.simpleLogger.log.io.github.jdbc2odbc=trace
+
+## See Also
+* [sun.jdbc.odbc.JdbcOdbcDriver](https://stackoverflow.com/a/57408440/141736) - Only unofficial, closed sourced downloads. Free. Not supported
+* [CData JDBC-ODBC Bridge](https://www.cdata.com/drivers/bridge/jdbc/) - closed source, supported, commercial (free trial available).
