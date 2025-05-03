@@ -152,6 +152,12 @@
                 <artifactId>commons-lang3</artifactId>
                 <version>3.17.0</version>
             </dependency>
+            <!-- https://mvnrepository.com/artifact/org.dmfs/rfc3986-uri -->
+            <dependency>
+                <groupId>org.dmfs</groupId>
+                <artifactId>rfc3986-uri</artifactId>
+                <version>0.8.1</version>
+            </dependency>
         </dependencies>
     <!--</dependencyManagement>-->
     <build>
@@ -161,7 +167,7 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>3.0.0</version>
                     <configuration>
-                        <forkCount>1</forkCount>
+                        <forkCount>0</forkCount>
                     </configuration>
 
                 </plugin>

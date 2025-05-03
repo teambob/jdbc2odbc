@@ -1,5 +1,7 @@
 package io.github.jdbc2odbc;
 
+import org.junit.jupiter.api.Disabled;
+
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -21,6 +23,13 @@ class DriverTest {
         assertNotNull(driver);
         Connection cursor = driver.connect("jdbc:odbc://abc", new Properties());
         assertNotNull(cursor);
+    }
+    @org.junit.jupiter.api.Test
+    //@Disabled
+    void odbc_test_connect() throws SQLException {
+        Driver driver = new Driver();
+        assertNotNull(driver);
+        assertTrue(driver.acceptsURL("jdbc:odbc://odbc_test"));
     }
     @org.junit.jupiter.api.Test
     void query() throws SQLException {

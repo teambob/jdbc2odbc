@@ -1,8 +1,6 @@
 package io.github.jdbc2odbc;
 
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.DriverPropertyInfo;
 import java.sql.SQLException;
@@ -10,6 +8,7 @@ import java.sql.SQLFeatureNotSupportedException;
 import java.util.Properties;
 
 import com.jcabi.aspects.Loggable;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.lwjgl.odbc.SQL;
 import org.lwjgl.*;
 import static org.lwjgl.system.Configuration.*;
+
 
 import org.apache.commons.lang3.*;
 
@@ -66,19 +66,7 @@ public class Driver implements java.sql.Driver {
     @Override
     @Loggable(Loggable.TRACE)
     public boolean acceptsURL(String s) throws SQLException {
-        if (!s.startsWith("jdbc:"))
-            return false;
-
-        URI uri = null;
-        try {
-            uri = new URI(s.substring("jdbc:".length()));
-        } catch (URISyntaxException e) {
-            return false;
-        }
-        return (
-                uri.getScheme() != null
-                && uri.getHost() != null
-        );
+        return io.github.jdbc2odbc.Connection.acceptsURL(s);
     }
 
     @Override

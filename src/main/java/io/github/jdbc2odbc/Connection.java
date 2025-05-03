@@ -1,5 +1,7 @@
 package io.github.jdbc2odbc;
 
+import org.dmfs.optional.Optional;
+import org.dmfs.rfc3986.UriEncoded;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.system.MemoryUtil;
@@ -8,20 +10,23 @@ import com.jcabi.aspects.Loggable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.URI;
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.sql.ResultSet;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
 
 import static org.lwjgl.odbc.SQL.*;
+
+import org.dmfs.rfc3986.Uri;
+import org.dmfs.rfc3986.encoding.Precoded;
+import org.dmfs.rfc3986.uris.LazyUri;
+import org.dmfs.rfc3986.Authority;
+import org.dmfs.rfc3986.authorities.EncodedAuthority;
+
 
 public class Connection implements java.sql.Connection {
     private static Logger LOGGER = LoggerFactory.getLogger(Connection.class);
@@ -38,12 +43,24 @@ public class Connection implements java.sql.Connection {
 
         connHandle = outHandle.get();
 
-        URI uri = URI.create(s.substring("jdbc:".length()));
+        if (!s.startsWith("jdbc:"))
+            throw new SQLException("SQLConnect() failed: URL format invalid");
+
+        Uri uri = null;
+        try {
+            uri = new LazyUri(new Precoded(s.substring("jdbc:".length())));
+        } catch (IllegalArgumentException e) {
+            throw new SQLException("SQLConnect() failed: URL format invalid");
+        }
+        Authority authority = uri.authority().value();
+
         String user = properties.getProperty("user", "");
         String password = properties.getProperty("password", "");
 
-        if (uri.getUserInfo() != null) {
-            String[] list = uri.getUserInfo().split(":");
+        Optional<? extends UriEncoded> userInfo = uri.authority().value().userInfo();
+
+        if (userInfo.isPresent()) {
+            String[] list = userInfo.value().toString().split(":");
             user = list[0];
             if (list.length > 1) {
                 password = list[1];
@@ -54,8 +71,8 @@ public class Connection implements java.sql.Connection {
             System.setProperty("org.slf4j.simpleLogger.log.io.github.jdbc2odbc", properties.getProperty("LOG_LEVEL"));
         }
 
-        LOGGER.debug("uri.host={}", uri.getHost());
-        ret = SQLConnect(connHandle, uri.getHost(), user, password);
+        LOGGER.debug("uri.host={}", authority.host());
+        ret = SQLConnect(connHandle, authority.host(), user, password);
         if (ret != SQL_SUCCESS) {
             throw new SQLException("SQLConnect() failed");
         }
@@ -417,4 +434,23 @@ public class Connection implements java.sql.Connection {
     public boolean isWrapperFor(Class<?> aClass) throws SQLException {
         throw new SQLFeatureNotSupportedException("isWrapperFor() not supported");
     }
+
+    @Loggable(Loggable.TRACE)
+    public static boolean acceptsURL(String s) throws SQLException {
+        if (!s.startsWith("jdbc:"))
+            return false;
+
+        Uri uri = null;
+        try {
+            uri = new LazyUri(new Precoded(s.substring("jdbc:".length())));
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+        Optional<? extends Authority> authority = uri.authority();
+        return (
+                uri.scheme().isPresent()
+                && ! authority.value().host().toString().isEmpty()
+        );
+    }
+
 }
